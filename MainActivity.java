@@ -1,5 +1,6 @@
 package com.example.android.threads1;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,9 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.concurrent.Callable;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
@@ -25,27 +29,32 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
+    @BindView(R.id.displayThreadType)
     TextView textView;
+    @BindView(R.id.button)
+    Button goThread;
+    @BindView(R.id.button2)
+    Button goAsync;
+    @BindView(R.id.button3)
+    Button goEventbus;
+    @BindView(R.id.button4)
+    Button goRx;
+    @BindView(R.id.button5)
+    Button goBroadcast;
     Subscription mySubscription;
     BroadcastReceiver broadcastReceiver;
-    Button goThread, goAsync, goEventbus, goRx, goBroadcast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        textView = (TextView) findViewById(R.id.displayThreadType);
-        goThread = (Button) findViewById(R.id.button);
-        goAsync = (Button) findViewById(R.id.button2);
-        goEventbus = (Button) findViewById(R.id.button3);
-        goRx = (Button) findViewById(R.id.button4);
-        goBroadcast= (Button) findViewById(R.id.button5);
+        ButterKnife.bind(this);
 
     }
 
     //////////////////////Thread///////////////////////////////
 
+    @OnClick(R.id.button3)
     public void onEventBus(View view) {
 
         new Thread() { // Create new thread
@@ -57,11 +66,10 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-
-            ;
         }.start();
     }
 
+    @OnClick(R.id.button)
     public void onThread(View view) {
 
         new Thread() { // <<< anonymous class
@@ -79,8 +87,6 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-
-            ;
         }.start();
     }
 
@@ -88,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
     /////////////////////////asyncTask/////////////////////////
 
+    @OnClick(R.id.button2)
     public void onAsyncTask(View view) { //uses generics - 3 kinds: onPreExecute do in background, onPostExecute, onProgress
 
         new AsyncTask<Integer, Void, String>() { //autoboxing
@@ -102,9 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                     return "AsyncTask Error";
                 }
-
             }
-
             @Override
             protected void onPostExecute(String s) { // runs in UI
                 super.onPostExecute(s);
@@ -157,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+        // unregiter broadcase receiver as well
         unregisterReceiver(broadcastReceiver);
     }
 
@@ -164,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
     //////////////////////////RX Java///////////////////////////////
 
+    @OnClick (R.id.button4)
     public void onRxJava(View view) {  // observer subscribes with observable
 
         Observable<Integer> myObservable = Observable.fromCallable(
@@ -210,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
     //////////////////////////Broadcast Receiver////////////////////
 
+    @OnClick(R.id.button5)
     public void onBroadcastReceiver(View view) {
 
         IntentFilter intentFilter = new IntentFilter();
